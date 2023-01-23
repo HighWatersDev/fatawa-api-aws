@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  FatawaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Timeout: 10
+      Handler: main
+      Runtime: go1.x
+      Policies:
+        - AWSLambdaExecute
+        - DynamoDBCrudPolicy:
+            TableName: !Ref Fatawa
+      Events:
+        GetFatwa:
+          Type: Api
+          Properties:
+            Path: /fatwa/{id}
+            Method: GET
+            Auth:
+              ApiKeyRequired: true
+        GetFatawa:
+          Type: Api
+          Properties:
+            Path: /fatwa
+            Method: GET
+            Auth:
+              ApiKeyRequired: true
+        PutFatwa:
+          Type: Api
+          Properties:
+            Path: /fatwa
+            Method: POST
+            Auth:
+              ApiKeyRequired: true
+        DeleteFatwa:
+          Type: Api
+          Properties:
+            Path: /fatwa/{id}
+            Method: DELETE
+            Auth:
+              ApiKeyRequired: true
+        UpdateFatwa:
+          Type: Api
+          Properties:
+            Path: /fatwa/{id}
+            Method: PUT
+            Auth:
+              ApiKeyRequired: true
+    Metadata:
+      BuildMethod: makefile
+
+  Fatawa:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Fatawa
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2
